@@ -1,18 +1,31 @@
 /* 
-  INCODE WEB SDK AND REACT INTEGRATION 
+INCODE WEB SDK AND REACT INTEGRATION 
 
-  MORE INFO:
-  https://developer.incode.com/docs/tutorial-creating-an-identity-validation-app
+MORE INFO:
+https://developer.incode.com/docs/tutorial-creating-an-identity-validation-app
 */
 
 import React, { useEffect, useState, useRef } from "react";
-import { getIncodeToken } from "./incode-session-service";
-import translations from "./translations";
+import { incode } from "./incode";
 import "./App.css";
-let incode;
+
 let incodeSession;
-let SDKActive = false;
 let container;
+
+//Function to fetch the onboarding session from your backend
+async function startOnboardingSession() {
+  const tokenServerURL = process.env.REACT_APP_TOKEN_SERVER_URL;
+  const sessionStartUrl = `${tokenServerURL}/start`
+  
+  
+  const response = await fetch(sessionStartUrl);
+  if (!response.ok) {
+    const sessionData = await response.json();
+    throw new Error(sessionData.error);
+  }
+  
+  return await response.json();
+}
 
 function captureIdFrontSide() {
   incode.renderCamera("front", container, {
@@ -36,13 +49,13 @@ function captureIdBackSide() {
 
 function processId() {
   return incode
-    .processId({ token: incodeSession.token })
-    .then(() => {
-      captureSelfie();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  .processId({ token: incodeSession.token })
+  .then(() => {
+    captureSelfie();
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 }
 
 function captureSelfie() {
@@ -54,9 +67,11 @@ function captureSelfie() {
     showTutorial: true,
   });
 }
+
 function finishOnboarding() {
   incode.getFinishStatus(null, { token: incodeSession.token }).then(() => {
     console.log("Onboarding Finished");
+    container.innerHTML="Onboarding Finished";
   });
 }
 
@@ -66,51 +81,44 @@ function saveDeviceData() {
 }
 
 function App() {
+  const [session, setSession] = useState(null); // Stores the Session
   const incodeContainerRef = useRef(null);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-
+  
+  // Store data that will not trigger re-renders unless specifically told so
+  const isLoaded = useRef(false); 
+  
+  // Run this after the initial loading
   useEffect(() => {
-    if (!SDKActive) {
-      SDKActive = true;
-
-      const script = document.createElement("script");
-      script.src = process.env.REACT_APP_INCODE_WEB_SDK_URL;
-      script.async = true;
-
-      script.onload = async () => {
-        console.log("Incode Web SDK Loaded");
-        setScriptLoaded(true);
-        incode = window.OnBoarding.create({
-          apiURL: process.env.REACT_APP_INCODE_API_URL,
-          translations
-        });
-        incodeSession = await getIncodeToken();
-
-        container = incodeContainerRef.current;
-
-        saveDeviceData();
-        captureIdFrontSide();
-      };
-      script.onerror = () => {
-        console.error("Error loading the Incode Web SDK");
-        setScriptLoaded(false);
-      };
-
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
+    // Only fetch the data if we havent fetched it yet
+    if (isLoaded.current) return;
+    
+    //Fetch the session and save it on the session variable
+    startOnboardingSession().then(async (session) => {
+      setSession(session);
+    }).catch(
+      (e)=>console.log(e)
+    );
+    
+    // We already sent the async call, don't call it again
+    isLoaded.current = true;
   }, []);
-
+  
+  useEffect(()=>{
+    container = incodeContainerRef.current;
+    if(session){
+      incodeSession=session;
+      saveDeviceData();
+      captureIdFrontSide();
+    };
+  }, [session])
+ 
   return (
     <div className="App">
-      {scriptLoaded ? (
-        <div ref={incodeContainerRef}></div>
-      ) : (
-        <p>Loading the Incode Web SDK...</p>
-      )}
+    <div ref={incodeContainerRef}></div>
+    {!session && (
+      <p>Starting session...</p>
+    )}
+    <div ref={incodeContainerRef}></div>
     </div>
   );
 }

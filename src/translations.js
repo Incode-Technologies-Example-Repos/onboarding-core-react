@@ -1,4 +1,4 @@
-export default {
+const translations = {
   aes: {
     confirmSignature: {
       contract: "Contrato",
@@ -1372,3 +1372,5 @@ export default {
   },
   youllNeed: "Vas a necesitar:",
 };
+
+export default translations;
