@@ -11,27 +11,27 @@ Create your `.env` file based on the `.env.example` file`.
 
 ```env
 # Incode API URL for demo or saas environment 
-REACT_APP_INCODE_API_URL="https://demo-api.incodesmile.com/0"
+REACT_APP_INCODE_API_URL=https://demo-api.incodesmile.com/0
 
-# URL of your backend server that does `/start`
-REACT_APP_TOKEN_SERVER_URL="https://your-backend-server.com"
+# HERE ONLY FOR DEMO PURPOSES, THE APIKEY AND THE FLOW_ID SHOULD NEVER BE IN THE FRONTEND.
+REACT_APP_BACKEND_APIURL=https://demo-api.incodesmile.com
+REACT_APP_BACKEND_APIKEY=
+REACT_APP_BACKEND_FLOWID=
 ```
 
 ## Run the project
 To run the project execute the following command in the terminal:
 ```bash
-npm install
+npm start
 ```
 
 Test the application in your mobile phone: https://your-local-ip:5173/
 
-## Backend Server
-A backend server that will start the session is needed for this sample,
-luckily for you we already have a sample server for NodeJS, please reffer
-to our documentation on subject: [Sample Backend Server](https://developer.incode.com/docs/code-samples-for-web-integrations#backend-sample-server)
-
-You will need to expose this server to the internet using something like
-[ngrok](https://ngrok.com/docs/getting-started/)
+# Fake Backend Server
+Starting and Finishing the session must be done in the backend, to simplify development this
+sample includes a fake_backend.js file that does this in the frontend, please be advised to
+replace this with a proper backend for your production runs. the APIKEY should never be
+exposed in the frontend.
 
 ## About the Incode Web SDK
 

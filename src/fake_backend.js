@@ -1,6 +1,6 @@
-const apiurl = import.meta.env.VITE_FAKE_BACKEND_APIURL;
-const flowid = import.meta.env.VITE_FAKE_BACKEND_FLOWID;
-const apikey = import.meta.env.VITE_FAKE_BACKEND_APIKEY
+const apiurl = process.env.REACT_APP_BACKEND_APIURL;
+const flowid = process.env.REACT_APP_BACKEND_FLOWID;
+const apikey = process.env.REACT_APP_BACKEND_APIKEY
 
 const defaultHeader = {
     'Content-Type': "application/json",
