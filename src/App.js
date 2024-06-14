@@ -7,7 +7,7 @@ https://developer.incode.com/docs/tutorial-creating-an-identity-validation-app
 
 import React, { useEffect, useState, useRef } from "react";
 import { incode } from "./incode";
-import { startOnboardingSession, finishOnboardingSession } from "./session";
+import { fakeBackendStart, fakeBackendFinish } from './fake_backend'
 import "./App.css";
 
 let incodeSession;
@@ -60,7 +60,7 @@ function captureSelfie() {
 }
 
 function finishOnboarding() {
-  finishOnboardingSession(incodeSession.token).then(() => {
+  fakeBackendFinish(incodeSession.token).then(() => {
     console.log("Onboarding Finished");
     container.innerHTML="Onboarding Finished";
   });
@@ -79,7 +79,7 @@ function App() {
     if (isLoaded.current) return;
     
     //Fetch the session and save it on the session variable
-    startOnboardingSession().then(async (session) => {
+    fakeBackendStart().then(async (session) => {
       setSession(session);
     }).catch(
       (e)=>console.log(e)
