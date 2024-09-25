@@ -33,6 +33,8 @@ sample includes a fake_backend.js file that does this in the frontend, please be
 replace this with a proper backend for your production runs. the APIKEY should never be
 exposed in the frontend.
 
+For this to work you will need to visit the page on your localip instead of localhost (ex: https://your-ip:5173), localhost will result in cors errors.
+
 ## About the Incode Web SDK
 
 Please read our official documentation [about Incode WebSDK](https://developer.incode.com/docs/about-incode-websdk)
