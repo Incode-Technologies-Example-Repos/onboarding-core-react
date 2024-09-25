@@ -7,24 +7,15 @@ https://developer.incode.com/docs/tutorial-creating-an-identity-validation-app
 
 import React, { useEffect, useState, useRef } from "react";
 import { incode } from "./incode";
+import { fakeBackendStart, fakeBackendFinish } from './fake_backend'
 import "./App.css";
 
 let incodeSession;
 let container;
 
-//Function to fetch the onboarding session from your backend
-async function startOnboardingSession() {
-  const tokenServerURL = process.env.REACT_APP_TOKEN_SERVER_URL;
-  const sessionStartUrl = `${tokenServerURL}/start`
-  
-  
-  const response = await fetch(sessionStartUrl);
-  if (!response.ok) {
-    const sessionData = await response.json();
-    throw new Error(sessionData.error);
-  }
-  
-  return await response.json();
+function saveDeviceData() {
+  incode.sendGeolocation({ token: incodeSession.token });
+  incode.sendFingerprint({ token: incodeSession.token });
 }
 
 function captureIdFrontSide() {
@@ -69,15 +60,10 @@ function captureSelfie() {
 }
 
 function finishOnboarding() {
-  incode.getFinishStatus(null, { token: incodeSession.token }).then(() => {
+  fakeBackendFinish(incodeSession.token).then(() => {
     console.log("Onboarding Finished");
     container.innerHTML="Onboarding Finished";
   });
-}
-
-function saveDeviceData() {
-  incode.sendGeolocation({ token: incodeSession.token });
-  incode.sendFingerprint({ token: incodeSession.token });
 }
 
 function App() {
@@ -93,7 +79,7 @@ function App() {
     if (isLoaded.current) return;
     
     //Fetch the session and save it on the session variable
-    startOnboardingSession().then(async (session) => {
+    fakeBackendStart().then(async (session) => {
       setSession(session);
     }).catch(
       (e)=>console.log(e)
