@@ -6,25 +6,26 @@ https://developer.incode.com/docs/tutorial-creating-an-identity-validation-app
 */
 
 import React, { useEffect, useState, useRef } from "react";
-import { renderCaptureId } from "@incodetech/welcome";
 import { incode } from "./incode";
+import { fakeBackendStart, fakeBackendFinish } from "./fake_backend";
 import "./App.css";
 
 let incodeSession;
 let container;
 
 function captureId() {
-  renderCaptureId(container, {
+  console.log({incodeSession});
+  incode.renderCaptureId(container, {
     onSuccess: processId,
     onError: console.log,
     session: incodeSession,
-    //forceIdV2: true 
+    forceIdV2: true
   });
 }
 
 function processId() {
   return incode
-    .processId({ token: incodeSession.token })
+    .processId(incodeSession)
     .then(() => {
       captureSelfie();
     })
@@ -44,7 +45,10 @@ function captureSelfie() {
 }
 
 function finishOnboarding() {
-  container.innerHTML = "Onboarding Finished";
+  fakeBackendFinish(incodeSession.token).then((response) => {
+    console.log(response);
+    container.innerHTML = "Onboarding Finished";
+  });
 }
 
 function App() {
@@ -56,25 +60,30 @@ function App() {
 
   // Run this after the initial loading
   useEffect(() => {
+    console.log("Starting session");
     // Only fetch the data if we havent fetched it yet
     if (isLoaded.current) return;
 
-    incode
-    .createSession("ALL", null, {
-      configurationId: process.env.REACT_APP_BACKEND_FLOWID,
-    })
-    .then((session) => {
-      setSession(session);
-    });
+    async function initializeIncode() {
+      console.log("initializing Incode");
+      fakeBackendStart().then(async (session) => {
+        console.log("we have session", session);
+        setSession(session);
+        //await incode.initialize();
+        
+        isLoaded.current = true;
+      });
+    }
 
-    // We already sent the async call, don't call it again
-    isLoaded.current = true;
+    initializeIncode();
   }, []);
 
   useEffect(() => {
+    console.log("Session changed");
     container = incodeContainerRef.current;
     if (session) {
       incodeSession = session;
+      console.log("call captureId");
       captureId();
     }
   }, [session]);
