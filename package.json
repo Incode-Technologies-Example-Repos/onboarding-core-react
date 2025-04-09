@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@incodetech/welcome": "1.75.0",
+    "@incodetech/welcome": "^1.79.0-20250409131344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1"
