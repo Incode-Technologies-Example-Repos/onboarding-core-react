@@ -28,7 +28,7 @@ function checkMandatoryConsent() {
     // }
     // If the response has showMandatoryConsent and is set to true, we need to show the mandatory consent
     if (response?.showMandatoryConsent) {
-      incode.renderMandatoryConsent(container, {
+      incode.renderBiometricConsent(container, {
         token: incodeSession,
         onSuccess: captureCombinedConsent,
         onCancel: () => console.log("Mandatory consent was denied"),
@@ -57,10 +57,10 @@ function sendGeolocation() {
   captureId();
 }
 function captureId() {
-  incode.renderIdCapture(container, {
+  incode.renderCaptureId(container, {
+    session: incodeSession,
     onSuccess: processId,
     onError: console.log,
-    session: incodeSession,
   });
 }
 
